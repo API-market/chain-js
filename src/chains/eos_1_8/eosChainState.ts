@@ -3,7 +3,7 @@ import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig' // development only
 import nodeFetch from 'node-fetch' // node only; not needed in browsers
 import { TextEncoder, TextDecoder } from 'util' // for node only; native TextEncoder/Decoder
 import { throwNewError, throwAndLogError } from '../../errors'
-import { ChainInfo, ChainEndpoint, ChainSettings, ConfirmType } from '../../models'
+import { ChainInfo, ChainEndpoint, ChainSettings, ConfirmType, CommunicationSettings } from '../../models'
 import { trimTrailingChars, isNullOrEmpty } from '../../helpers'
 import { EosSignature, EosEntityName, EOSGetTableRowsParams } from './models'
 import { mapChainError } from './eosErrors'
@@ -215,7 +215,7 @@ export class EosChainState {
     serializedTransaction: any,
     signatures: EosSignature[],
     waitForConfirm?: ConfirmType,
-    communicationSettings?: any,
+    communicationSettings?: CommunicationSettings,
   ) {
     // Default confirm to not wait for any block confirmations
     const useWaitForConfirm = waitForConfirm ?? ConfirmType.None
@@ -223,6 +223,10 @@ export class EosChainState {
     if (useWaitForConfirm !== ConfirmType.None && useWaitForConfirm !== ConfirmType.After001) {
       throwNewError('Only ConfirmType.None or .After001 are currently supported for waitForConfirm parameters')
     }
+
+    const useCommunicationSettings: CommunicationSettings = communicationSettings
+      ? this.chainSettings?.communicationSettings
+      : communicationSettings
 
     const signedTransaction = { signatures, serializedTransaction }
     let sendReceipt
@@ -241,7 +245,7 @@ export class EosChainState {
       if (!startFromBlockNumber) {
         ;({ head_block_num: startFromBlockNumber } = await this.getChainInfo())
       }
-      await this.awaitTransaction(sendReceipt, useWaitForConfirm, startFromBlockNumber, communicationSettings)
+      await this.awaitTransaction(sendReceipt, useWaitForConfirm, startFromBlockNumber, useCommunicationSettings)
     }
     return sendReceipt
   }
@@ -259,7 +263,7 @@ export class EosChainState {
     transactionResponse: any,
     waitForConfirm: ConfirmType,
     startFromBlockNumber: number,
-    communicationSettings: any,
+    communicationSettings: CommunicationSettings,
   ) {
     // use default communicationSettings or whatever was passed-in in ChainSettings (via constructor)
     const useCommunicationSettings = communicationSettings ?? {

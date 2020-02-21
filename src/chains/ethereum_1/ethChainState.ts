@@ -1,5 +1,5 @@
 import { throwNewError, throwAndLogError } from '../../errors'
-import { ChainInfo, ChainEndpoint, ChainSettings, ConfirmType } from '../../models'
+import { ChainInfo, ChainEndpoint, ChainSettings, ConfirmType, CommunicationSettings } from '../../models'
 import { trimTrailingChars } from '../../helpers'
 import { mapChainError } from './ethErrors'
 import { DEFAULT_BLOCKS_TO_CHECK, DEFAULT_GET_BLOCK_ATTEMPTS, DEFAULT_CHECK_INTERVAL } from './ethConstants'
@@ -154,7 +154,7 @@ export class EthereumChainState {
     serializedTransaction: any,
     signatures: string[],
     waitForConfirm?: ConfirmType,
-    communicationSettings?: any,
+    communicationSettings?: CommunicationSettings,
   ) {
     // Default confirm to not wait for any block confirmations
     const useWaitForConfirm = waitForConfirm ?? ConfirmType.None
@@ -162,6 +162,10 @@ export class EthereumChainState {
     if (useWaitForConfirm !== ConfirmType.None && useWaitForConfirm !== ConfirmType.After001) {
       throwNewError('Only ConfirmType.None or .After001 are currently supported for waitForConfirm parameters')
     }
+
+    const useCommunicationSettings: CommunicationSettings = communicationSettings
+      ? this.chainSettings?.communicationSettings
+      : communicationSettings
 
     const signedTransaction = { signatures, serializedTransaction }
     let transaction
@@ -174,7 +178,7 @@ export class EthereumChainState {
     }
 
     if (useWaitForConfirm !== ConfirmType.None) {
-      transaction = await this.awaitTransaction(transaction, useWaitForConfirm, communicationSettings)
+      transaction = await this.awaitTransaction(transaction, useWaitForConfirm, useCommunicationSettings)
     }
 
     return transaction
@@ -188,7 +192,11 @@ export class EthereumChainState {
         checkInterval = the time between block checks in MS
         getBlockAttempts = the number of failed attempts at retrieving a particular block, before giving up
   */
-  async awaitTransaction(transactionResponse: any, waitForConfirm: ConfirmType, communicationSettings: any) {
+  async awaitTransaction(
+    transactionResponse: any,
+    waitForConfirm: ConfirmType,
+    communicationSettings: CommunicationSettings,
+  ) {
     // use default communicationSettings or whatever was passed-in in ChainSettings (via constructor)
     const useCommunicationSettings = communicationSettings ?? {
       ...EthereumChainState.defaultCommunicationSettings,
