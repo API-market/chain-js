@@ -1,4 +1,4 @@
-import { TransactionOptions, ConfirmType, Signature, PublicKey, PrivateKey } from '../models'
+import { TransactionOptions, ConfirmType, Signature, PublicKey, PrivateKey, CommunicationSettings } from '../models'
 
 /**
  * The Transaction interface declares the operations that all concrete chain (chain)transaction classes must implement
@@ -52,7 +52,7 @@ export interface Transaction {
   setSerialized(serialized: any): Promise<void>
   /** Broadcast a signed transaction to the chain
    *  waitForConfirm specifies whether to wait for a transaction to appear in a block (or irreversable block) before returning */
-  send(waitForConfirm?: ConfirmType): Promise<any>
+  send(waitForConfirm?: ConfirmType, communicationSettings?: CommunicationSettings): Promise<any>
   /** Sign the transaction body with private key(s) and add to attached signatures */
   sign(privateKeys: PrivateKey[]): void
   /** JSON representation of transaction data */

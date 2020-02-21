@@ -54,6 +54,13 @@ export type ChainSettings = {
   unusedAccountPublicKey?: string
 }
 
+/** Settings for transaction confirmation */
+export type CommunicationSettings = {
+  blocksToCheck: number
+  checkInterval: number
+  getBlockAttempts: number
+}
+
 /** Chain urls and related details used to connect to chain */
 export type ChainEndpoint = {
   url: URL
