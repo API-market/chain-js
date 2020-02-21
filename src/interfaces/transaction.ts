@@ -52,7 +52,7 @@ export interface Transaction {
   setSerialized(serialized: any): Promise<void>
   /** Broadcast a signed transaction to the chain
    *  waitForConfirm specifies whether to wait for a transaction to appear in a block (or irreversable block) before returning */
-  send(waitForConfirm?: ConfirmType): Promise<any>
+  send(waitForConfirm: ConfirmType): Promise<any>
   /** Sign the transaction body with private key(s) and add to attached signatures */
   sign(privateKeys: PrivateKey[]): void
   /** JSON representation of transaction data */
