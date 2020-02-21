@@ -6,7 +6,7 @@ import { throwAndLogError, throwNewError } from '../../errors'
 import { DEFAULT_TRANSACTION_BLOCKS_BEHIND_REF_BLOCK, DEFAULT_TRANSACTION_EXPIRY_IN_SECONDS } from './eosConstants'
 import { EosAccount } from './eosAccount'
 import { getPublicKeyFromSignature, sign as cryptoSign } from './eosCrypto'
-import { ConfirmType, TransactionOptions } from '../../models'
+import { ConfirmType, TransactionOptions, CommunicationSettings } from '../../models'
 import { Transaction } from '../../interfaces'
 import { isValidEosSignature, isValidEosPrivateKey, toEosPublicKey } from './helpers'
 
@@ -428,10 +428,18 @@ export class EosTransaction implements Transaction {
   // send
   /** Broadcast a signed transaction to the chain
    *  waitForConfirm specifies whether to wait for a transaction to appear in a block (or irreversable block) before returning */
-  public async send(waitForConfirm: ConfirmType = ConfirmType.None): Promise<any> {
+  public async send(
+    waitForConfirm: ConfirmType = ConfirmType.None,
+    communicationSettings?: CommunicationSettings,
+  ): Promise<any> {
     this.assertIsValidated()
     this.assertHasAllRequiredSignature()
-    this._sendReceipt = await this._chainState.sendTransaction(this._serialized, this.signatures, waitForConfirm)
+    this._sendReceipt = await this._chainState.sendTransaction(
+      this._serialized,
+      this.signatures,
+      waitForConfirm,
+      communicationSettings,
+    )
     return this._sendReceipt
   }
 

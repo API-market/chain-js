@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { EthereumChainState } from './ethChainState'
 import { Transaction } from '../../interfaces'
-import { ConfirmType, TransactionOptions } from '../../models'
+import { ConfirmType, TransactionOptions, CommunicationSettings } from '../../models'
 import { throwNewError } from '../../errors'
 import { isNullOrEmpty, getUniqueValues } from '../../helpers'
 
@@ -312,11 +312,14 @@ export class EthereumTransaction implements Transaction {
 
   // send
 
-  public send(waitForConfirm: ConfirmType = ConfirmType.None): Promise<any> {
+  public send(
+    waitForConfirm: ConfirmType = ConfirmType.None,
+    communicationSettings?: CommunicationSettings,
+  ): Promise<any> {
     this.assertIsValidated()
     this.assertHasAllRequiredSignature()
     const signedTransaction = { signatures: this.signatures, serializedTransaction: this._serialized }
-    return this._chainState.sendTransaction(this._serialized, this.signatures, waitForConfirm)
+    return this._chainState.sendTransaction(this._serialized, this.signatures, waitForConfirm, communicationSettings)
   }
 
   // helpers
