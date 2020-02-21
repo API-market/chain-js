@@ -3,7 +3,6 @@ import { EosChainState } from './eosChainState'
 import { EosAuthorization, EosActionStruct, EosPublicKey, EosEntityName, EosSignature, EosPrivateKey } from './models'
 import { isAString, isAnObject, isNullOrEmpty, getUniqueValues } from '../../helpers'
 import { throwAndLogError, throwNewError } from '../../errors'
-import { DEFAULT_TRANSACTION_BLOCKS_BEHIND_REF_BLOCK, DEFAULT_TRANSACTION_EXPIRY_IN_SECONDS } from './eosConstants'
 import { EosAccount } from './eosAccount'
 import { getPublicKeyFromSignature, sign as cryptoSign } from './eosCrypto'
 import { ConfirmType, TransactionOptions } from '../../models'
@@ -44,8 +43,8 @@ export class EosTransaction implements Transaction {
   constructor(chainState: EosChainState, options?: TransactionOptions) {
     this._chainState = chainState
     let { blocksBehind, expireSeconds } = options || {}
-    blocksBehind = blocksBehind ?? DEFAULT_TRANSACTION_BLOCKS_BEHIND_REF_BLOCK
-    expireSeconds = expireSeconds ?? DEFAULT_TRANSACTION_EXPIRY_IN_SECONDS
+    blocksBehind = blocksBehind ?? this._chainState?.chainSettings?.defaultTransactionSettings?.blocksBehind
+    expireSeconds = expireSeconds ?? this._chainState?.chainSettings?.defaultTransactionSettings?.expireSeconds
     this._options = { blocksBehind, expireSeconds }
   }
 
