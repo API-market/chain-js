@@ -48,6 +48,10 @@ export type ChainSettings = {
     checkInterval: number
     getBlockAttempts: number
   }
+  defaultTransactionSettings?: {
+    blocksBehind: number
+    expireSeconds: number
+  }
   fetch?: any
   monitorType?: ChainMonitorType
   monitorUrl?: URL
