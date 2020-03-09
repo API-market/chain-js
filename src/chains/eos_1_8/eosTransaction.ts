@@ -44,8 +44,8 @@ export class EosTransaction implements Transaction {
   constructor(chainState: EosChainState, options?: TransactionOptions) {
     this._chainState = chainState
     let { blocksBehind, expireSeconds } = options || {}
-    blocksBehind = blocksBehind ?? DEFAULT_TRANSACTION_BLOCKS_BEHIND_REF_BLOCK
-    expireSeconds = expireSeconds ?? DEFAULT_TRANSACTION_EXPIRY_IN_SECONDS
+    blocksBehind = this._chainState?.chainSettings?.defaultTransactionSettings?.blocksBehind
+    expireSeconds = this._chainState?.chainSettings?.defaultTransactionSettings?.expireSeconds
     this._options = { blocksBehind, expireSeconds }
   }
 

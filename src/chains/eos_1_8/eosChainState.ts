@@ -7,7 +7,13 @@ import { ChainInfo, ChainEndpoint, ChainSettings, ConfirmType, CommunicationSett
 import { trimTrailingChars, isNullOrEmpty } from '../../helpers'
 import { EosSignature, EosEntityName, EOSGetTableRowsParams } from './models'
 import { mapChainError } from './eosErrors'
-import { DEFAULT_BLOCKS_TO_CHECK, DEFAULT_GET_BLOCK_ATTEMPTS, DEFAULT_CHECK_INTERVAL } from './eosConstants'
+import {
+  DEFAULT_BLOCKS_TO_CHECK,
+  DEFAULT_GET_BLOCK_ATTEMPTS,
+  DEFAULT_CHECK_INTERVAL,
+  DEFAULT_TRANSACTION_BLOCKS_BEHIND_REF_BLOCK,
+  DEFAULT_TRANSACTION_EXPIRY_IN_SECONDS,
+} from './eosConstants'
 
 export class EosChainState {
   private eosChainInfo: RpcInterfaces.GetInfoResult
@@ -32,7 +38,24 @@ export class EosChainState {
     // TODO chainjs check for valid settings and throw if bad
     this._endpoints = endpoints
     // TODO chainjs check for valid settings and throw if bad
-    this._chainSettings = settings
+    this._chainSettings = this.applyDefaultSettings(settings)
+  }
+
+  public applyDefaultSettings = (settings?: ChainSettings): ChainSettings => {
+    return {
+      ...settings,
+      communicationSettings: {
+        blocksToCheck: DEFAULT_BLOCKS_TO_CHECK,
+        checkInterval: DEFAULT_CHECK_INTERVAL,
+        getBlockAttempts: DEFAULT_GET_BLOCK_ATTEMPTS,
+        ...settings?.communicationSettings,
+      },
+      defaultTransactionSettings: {
+        blocksBehind: DEFAULT_TRANSACTION_BLOCKS_BEHIND_REF_BLOCK,
+        expireSeconds: DEFAULT_TRANSACTION_EXPIRY_IN_SECONDS,
+        ...settings?.defaultTransactionSettings,
+      },
+    }
   }
 
   /** Return chain URL endpoints */
