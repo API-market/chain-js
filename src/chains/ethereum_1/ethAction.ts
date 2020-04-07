@@ -1,3 +1,4 @@
+import { BN } from 'ethereumjs-util'
 import { isNullOrEmpty } from '../../helpers'
 import { EthereumAddress, EthereumValue, EthereumTxData, EthereumTransactionAction } from './models'
 import { ethereumTrxArgIsNullOrEmpty, generateDataFromContractAction, toEthereumTxData } from './helpers'
@@ -10,7 +11,7 @@ export class EthereumActionHelper {
 
   private _to: EthereumAddress
 
-  private _value: EthereumValue
+  private _value: EthereumValue | BN
 
   /** Creates a new Action from 'human-readable' transfer or contact info
    *  OR from 'raw' data property

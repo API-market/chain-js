@@ -1,3 +1,4 @@
+import { BN } from 'ethereumjs-util'
 import { EthereumValue } from './generalModels'
 
 /** Transaction 'header' options set to chain along with transaction */
@@ -36,7 +37,7 @@ export type EthereumTransactionHeader = {
  *  contract property used only to generate data prop when creating an new action */
 export type EthereumTransactionAction = {
   to?: EthereumAddress
-  value?: EthereumValue
+  value?: EthereumValue | BN
   data?: EthereumTxData
   contract?: EthereumActionContract
 }
