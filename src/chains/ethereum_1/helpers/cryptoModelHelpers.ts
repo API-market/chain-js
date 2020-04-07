@@ -104,7 +104,7 @@ export function toEthereumSignature(value: string | ECDSASignature): EthereumSig
  *  Returns EthereumAddress with prefix
  */
 export function toEthereumAddress(value: string): EthereumAddress {
-  if (isValidEthereumAddress(value)) {
+  if (isValidEthereumAddress(addPrefixToHex(value))) {
     return addPrefixToHex(value) as EthereumAddress
   }
   throw new Error(`Not a valid ethereum address:${value}.`)
