@@ -278,7 +278,7 @@ export const sampleSetFromRawTrx = {
   //  gasLimit: '0x00',
 }
 
-export const ropstenChainOptions: ChainForkType = {
+export const ropstenTransactionOptions: ChainForkType = {
   chainName: 'ropsten',
   hardFork: 'istanbul',
 }
@@ -313,10 +313,10 @@ const composeERC20MintParams = {
     //   chainForkType: ropstenChainOptions,
     // } as ChainSettings)
     // await ropsten.connect()
-    // console.log(await ropsten.chainInfo)
-    // const transaction = await ropsten.new.Transaction({})
-    // console.log('trx:', transaction)
-    // await transaction.addAction(sampleTransferTrx)
+    // // console.log(await ropsten.chainInfo)
+    // //const transaction = await ropsten.new.Transaction(ropstenTransactionOptions)
+    // // console.log('trx:', transaction)
+    // // await transaction.addAction(sampleTransferTrx)
     // transaction.actions = [ropsten.composeAction(ChainActionType.TokenTransfer, composeEthTransferParams)]
     // await transaction.prepareToBeSigned()
     // await transaction.validate()
@@ -341,7 +341,7 @@ const composeERC20MintParams = {
     // console.log(await transaction.send())
     // ---> Sign and send erc20 mint Transaction
     // const ropsten = new ChainFactory().create(ChainType.EthereumV1, ropstenEndpoints, {
-    //   chainForkType: ropstenChainOptions,
+    //   chainForkType: ropstenTransactionOptions,
     // } as ChainSettings)
     // await ropsten.connect()
     // // console.log(await ropsten.chainInfo)
