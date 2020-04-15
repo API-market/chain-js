@@ -1,5 +1,6 @@
-/** Transaction options used when contructing a trnasaction header */
+/** Transaction options used when contructing a transaction header */
 export type TransactionOptions = any
+export type TransactionReceipt = any
 
 /** Specifies how many block confirmations should be received before considering transaction is complete */
 export enum ConfirmType {
