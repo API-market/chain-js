@@ -44,6 +44,17 @@ export function toEosDate(date: string | Date | moment.Moment | EosDate): EosDat
   throw new Error(`Should not get here. (invalid toDateStr provided): ${date}`)
 }
 
+/** De-construct a formatted EOS Asset string *
+ *  e.g. '1.0000 EOS' returns { amount, symbol } */
+export function fromEosAsset(asset: EosAsset) {
+  if (!isValidEosAsset(asset)) {
+    throw new Error(`Input is not a valid EosAsset: ${asset}`)
+  }
+
+  const [amount, symbol] = asset.split(' ')
+  return { amount: Number(amount), symbol }
+}
+
 /** Construct a well-formatted EOS Asset string *
  *  e.g. '1.0000 EOS' */
 export function toEosAsset(amount: number, symbol: string): EosAsset {

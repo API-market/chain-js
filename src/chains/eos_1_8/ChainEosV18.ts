@@ -34,6 +34,7 @@ import {
   toEosEntityName,
   toEosAsset,
   toEosDate,
+  fromEosAsset,
 } from './helpers'
 import { EosActionStruct, EosChainSettings, EosEntityName, EosDate, EosCreateAccountOptions, EosDecomposeReturn } from './models'
 
@@ -227,6 +228,14 @@ class ChainEosV18 implements Chain {
 
   /** Ensures that the value comforms to a well-formed EOS asset string */
   toEosAsset = toEosAsset
+
+  /** Ensures that the value comforms to a well-formed chain asset string */
+  public fromAsset = (asset: ChainAsset): { amount: number; symbol: string } => {
+    return fromEosAsset(asset)
+  }
+
+  /** Ensures that the value comforms to a well-formed EOS asset string */
+  fromEosAsset = fromEosAsset
 
   /** Ensures that the value comforms to a well-formed chain entity name (e.g. an account name) */
   public toEntityName = (value: string): ChainEntityName => {

@@ -29,6 +29,7 @@ import {
   EthereumTransactionAction,
   EthereumChainActionType,
   EthereumDecomposeReturn,
+  EthereumAsset,
 } from './models'
 import {
   isValidEthereumAsset,
@@ -42,6 +43,7 @@ import {
   toEthereumPublicKey,
   toEthereumPrivateKey,
   toEthereumSignature,
+  fromEthereumAsset,
 } from './helpers'
 import { notImplemented } from '../../helpers'
 
@@ -201,6 +203,14 @@ class ChainEthereumV1 implements Chain {
 
   /** Ensures that the value comforms to a well-formed Ethereum value */
   toEthereumAsset = toEthereumAsset
+
+  /** Deconstructs an EthereumAsset */
+  public fromAsset = (asset: EthereumAsset) => {
+    return fromEthereumAsset(asset)
+  }
+
+  /** Deconstructs an EthereumAsset */
+  fromEthereumAsset = fromEthereumAsset
 
   /** Ensures that the value comforms to a well-formed chain entity name (e.g. an account name) */
   public toEntityName = (value: string): ChainEntityName => {

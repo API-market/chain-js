@@ -55,6 +55,13 @@ export function toEthereumAsset(amount: number, unit: string): EthereumAsset {
   return toWei(amount, toEthUnit(unit)) as EthereumAsset
 }
 
+// TODO: Do this
+export function fromEthereumAsset(asset: EthereumAsset): { amount: number; unit: string } {
+  if (!isValidEthereumAsset(asset)) throw new Error('Must be valid ethereum asset')
+
+  return { amount: 0, unit: '' }
+}
+
 export function toEthereumEntityName(name: string): EthereumEntityName {
   if (isValidEthereumEntityName(name)) {
     return name

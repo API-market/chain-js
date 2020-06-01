@@ -89,6 +89,8 @@ export interface Chain {
   isValidDate(value: string): boolean
   /** Ensures that the value comforms to a well-formed chain asset string */
   toAsset(amount: number, symbol: string): ChainAsset
+  /** Deconstructs a chain asset string */
+  fromAsset(asset: ChainAsset): { amount: number; symbol?: string; unit?: string }
   /** Ensures that the value comforms to a well-formed chain entity name (e.g. an account name) */
   toEntityName(value: string): ChainEntityName
   /** Ensures that the value comforms to a well-formed chain date string */
