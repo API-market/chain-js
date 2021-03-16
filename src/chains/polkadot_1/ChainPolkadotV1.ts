@@ -1,4 +1,4 @@
-import { ChainActionType, ChainInfo, ChainType, CryptoCurve, ChainEntityName, ChainDate } from '../../models'
+import { ChainActionType, ChainType, CryptoCurve, ChainEntityName, ChainDate } from '../../models'
 import { ChainError } from '../../errors'
 import { Chain } from '../../interfaces'
 import {
@@ -13,9 +13,10 @@ import {
 import { PolkadotChainState } from './polkadotChainState'
 import { notImplemented } from '../../helpers'
 import { PolkadotChainActionType } from './models/chainActionType'
-import { PolkadotTransactionAction } from './models/transactionModels'
+import { PolkadotTransactionAction, PolkadotTransactionOptions } from './models/transactionModels'
 import { PolkadotAccount } from './polkadotAccount'
 import { PolkadotTransaction } from './polkadotTransaction'
+import { PolkadotCrypto } from './polkadotCrypto'
 
 import * as polkadotCrypto from './polkadotCrypto'
 import * as ethcrypto from '../ethereum_1/ethCrypto'
@@ -136,15 +137,20 @@ class ChainPolkadotV1 implements Chain {
     return new PolkadotCreateAccount(this._chainState, options)
   }
 
-  private newTransaction = (options?: any): PolkadotTransaction => {
+  private newTransaction = (options?: PolkadotTransactionOptions): PolkadotTransaction => {
     this.assertIsConnected()
     return new PolkadotTransaction(this._chainState, options)
+  }
+
+  private newCrypto = (options?: any): PolkadotCrypto => {
+    return new PolkadotCrypto(this._chainState, options)
   }
 
   public new = {
     Account: this.newAccount,
     CreateAccount: this.newCreateAccount,
     Transaction: this.newTransaction,
+    Crypto: this.newCrypto,
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
