@@ -1,8 +1,11 @@
 import { Chain } from '../../../interfaces'
 import { ChainFactory, ChainType } from '../../../index'
-import { PolkadotChainEndpoint } from '../models'
+import { PolkadotChainEndpoint, PolkadotKeyPairType } from '../models'
+import { ModelsCryptoAes } from '../../../models'
 
 require('dotenv').config()
+
+const { env } = process
 
 const westendEndpoints: PolkadotChainEndpoint[] = [
   {
@@ -11,7 +14,12 @@ const westendEndpoints: PolkadotChainEndpoint[] = [
 ]
 
 const createAccountOptions = {
-  // ...
+  newKeysOptions: {
+    password: '2233',
+    keypairType: PolkadotKeyPairType.Ecdsa,
+    encryptionOptions: ModelsCryptoAes.AesEncryptedDataStringBrand,
+    salt: env.EOS_KYLIN_PK_SALT_V0,
+  },
 }
 
 async function createAccount(paraChain: Chain) {
@@ -21,6 +29,14 @@ async function createAccount(paraChain: Chain) {
     await createdAccount.generateKeysIfNeeded()
     console.log('generatedKeys:', createdAccount.generatedKeys)
     console.log('address:', createdAccount.accountName)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+async function newAccount(paraChain: Chain) {
+  try {
+    await paraChain.connect()
     const account = await paraChain.new.Account('5FkJuxShVBRJRirM3t3k5Y8XyDaxMi1c8hLdBsH2qeAYqAzF')
     console.log('account', account)
   } catch (error) {
@@ -31,11 +47,11 @@ async function createAccount(paraChain: Chain) {
 async function run() {
   try {
     const paraChainA = new ChainFactory().create(ChainType.PolkadotV1, westendEndpoints)
-    const paraChainB = new ChainFactory().create(ChainType.PolkadotV1, westendEndpoints)
-    const accountA = createAccount(paraChainA)
-    console.log('account', accountA)
-    const accountB = createAccount(paraChainB)
-    console.log('account', accountB)
+    // const paraChainB = new ChainFactory().create(ChainType.PolkadotV1, westendEndpoints)
+    await createAccount(paraChainA)
+    await newAccount(paraChainA)
+    // const accountB = createAccount(paraChainB)
+    // console.log('account', accountB)
   } catch (error) {
     console.log(error)
   }

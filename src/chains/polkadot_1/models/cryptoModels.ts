@@ -9,9 +9,9 @@ export enum PolkadotKeyPairType {
 }
 
 export type PolkadotNewKeysOptions = {
-  keyPairType?: PolkadotKeyPairType
-  phrase?: string
-  derivationPath?: string
+  password: string
+  keypairType: PolkadotKeyPairType
+  encryptionOptions: PolkadotEncryptionOptions
 }
 
 /** an address string - formatted correctly for polkadot */

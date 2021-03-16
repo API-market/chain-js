@@ -1,4 +1,4 @@
-import { notSupported } from '../../helpers'
+import { notImplemented } from '../../helpers'
 import { throwNewError } from '../../errors'
 import { Account } from '../../interfaces'
 import { PolkadotChainState } from './polkadotChainState'
@@ -18,13 +18,15 @@ export class PolkadotAccount implements Account {
 
   /** Whether the account is currently unused and can be reused - not supported in Polkadot */
   get canBeRecycled(): boolean {
-    return notSupported('PolkadotAccount.canBeRecycled')
+    return notImplemented()
+    // return notSupported('PolkadotAccount.canBeRecycled')
   }
 
   /** Polkadot address */
   get name(): any {
-    this.assertHasAddress()
-    return this._address
+    return notImplemented()
+    // this.assertHasAddress()
+    // return this._address
   }
 
   /** Public Key(s) associated with the account */

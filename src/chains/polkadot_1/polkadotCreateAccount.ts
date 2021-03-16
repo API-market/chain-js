@@ -6,12 +6,13 @@ import { PolkadotChainState } from './polkadotChainState'
 //   getKeypairFromPhrase,
 //   getPolkadotAddressFromPublicKey,
 // } from './polkadotCrypto'
-import { isValidPolkadotPublicKey } from './helpers'
-import { notImplemented, notSupported } from '../../helpers'
+import { getCurveFromKeyType, isValidPolkadotPublicKey } from './helpers'
+import { isNullOrEmpty, notImplemented, notSupported } from '../../helpers'
 import { CreateAccount } from '../../interfaces'
 import { throwNewError } from '../../errors'
-import { PolkadotAddress, PolkadotKeypair } from './models'
+import { PolkadotAddress, PolkadotKeypair, PolkadotPublicKey } from './models'
 import { CryptoCurve } from '../../models'
+import { generateNewAccountKeysAndEncryptPrivateKeys } from './polkadotCrypto'
 // import { DEFAULT_POLKADOT_KEY_PAIR_TYPE } from './polkadotConstants'
 
 /** Helper class to compose a transaction for creating a new chain account
@@ -96,7 +97,9 @@ export class PolkadotCreateAccount implements CreateAccount {
    *  Recycling is not supported on Polkadot.
    */
   async determineNewAccountName(accountName: PolkadotAddress): Promise<any> {
-    return { alreadyExists: false, newAccountName: accountName, canRecycle: false }
+    notImplemented()
+    return null
+    // return { alreadyExists: false, newAccountName: accountName, canRecycle: false }
   }
 
   /** Returns the Polkadot Address as a Polkadot Account name for the public key provided in options
@@ -112,42 +115,49 @@ export class PolkadotCreateAccount implements CreateAccount {
 
   /** Returns a string of the Polkadot Address for the public key provide in options - OR generates a new mnemonic(phrase)/private/public/address */
   async generateAccountNameString(): Promise<string> {
-    await this.generateKeysIfNeeded()
-    return this.accountName as string
+    notImplemented()
+    return null
+    // await this.generateKeysIfNeeded()
+    // return this.accountName as string
   }
 
   /** Checks create options - if publicKeys are missing,
    *  autogenerate the public and private key pair and add them to options
    */
   async generateKeysIfNeeded() {
-    // let publicKey: PolkadotPublicKey
-    // this.assertValidOptionPublicKeys()
-    // publicKey = this?._options?.publicKey
-    // if (!publicKey) {
-    //   await this.generateAccountKeys()
-    // }
-    // this._accountName = getPolkadotAddressFromPublicKey(this._generatedKeypair.publicKey)
-    // this._accountType = this._options.newKeysOptions.keyPairType
+    let publicKey: PolkadotPublicKey
+    this.assertValidOptionPublicKeys()
+    this.assertValidOptionNewKeys()
+    publicKey = this._options?.publicKey
+    if (!publicKey) {
+      await this.generateAccountKeys()
+      publicKey = this._generatedKeypair?.publicKey
+    }
+    const curve = getCurveFromKeyType(this._generatedKeypair?.type)
+    this._accountType = curve
+    // TODO: Determine whether polkadot has account name in production
+    // this._accountName = await getPolkadotAddressFromPublicKey(publicKey)
   }
 
-  // private async generateAccountKeys(): Promise<void> {
-  //   const { newKeysOptions } = this._options
-  //   const { keyPairType, phrase: overridePhrase, derivationPath } = newKeysOptions || {}
-  //   const overrideType = keyPairType || DEFAULT_POLKADOT_KEY_PAIR_TYPE
-
-  //   // this._generatedKeypair = getKeypairFromPhrase(overridePhrase, overrideType)
-  //   this._generatedKeypair = await generateKeyPair(keyPairType, phrase, derivationPath)
-  //   this._options.publicKey = this._generatedKeypair.publicKey
-  //   this._options.newKeysOptions = {
-  //     phrase: overridePhrase,
-  //     keyPairType: overrideType,
-  //   }
-  // }
+  private async generateAccountKeys(): Promise<void> {
+    const { newKeysOptions } = this._options || {}
+    const { password, keypairType, encryptionOptions } = newKeysOptions || {}
+    this._generatedKeypair = await generateNewAccountKeysAndEncryptPrivateKeys(password, keypairType, encryptionOptions)
+    this._options.publicKey = this._generatedKeypair?.publicKey
+  }
 
   private assertValidOptionPublicKeys() {
     const { publicKey } = this._options
     if (publicKey && isValidPolkadotPublicKey(publicKey)) {
       throwNewError('Invalid option - provided publicKey isnt valid')
+    }
+  }
+
+  private assertValidOptionNewKeys() {
+    const { newKeysOptions } = this._options
+    const { password } = newKeysOptions || {}
+    if (isNullOrEmpty(password)) {
+      throwNewError('Invalid Option - You must provide a password to generate new keys')
     }
   }
 }
