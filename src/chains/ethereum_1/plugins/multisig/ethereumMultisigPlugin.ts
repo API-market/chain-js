@@ -5,7 +5,7 @@ import {
   MultisigPlugin,
   MultisigPluginOptions,
 } from '../../../../interfaces/plugins/multisig'
-import { EthereumAddress, EthereumPrivateKey, EthereumSignature, EthereumTransactionAction } from '../../models'
+import { EthereumAddress, EthereumPrivateKey, EthereumTransactionAction } from '../../models'
 import { EthereumMultisigRawTransaction } from './gnosisSafeV1/models'
 
 export type EthereumMultisigTransactionOptions = any
@@ -85,23 +85,20 @@ export interface EthereumMultisigPluginTransaction extends MultisigPluginTransac
   requiresParentTransaction?: boolean
 
   /** Ethereum only supports one signature on a transaction so transaction wont ask multisig plugin for signature list - those are data in the contract */
-  // signatures: EthereumSignature[]
+  signatures: string[]
 
   /** Save action used for transaction body */
   addAction(action: EthereumTransactionAction): void
 
   /** Add a signature to the set of attached signatures. Automatically de-duplicates values. */
-  addSignatures(signature: any[]): Promise<void>
+  addSignatures(signature: string[]): Promise<void>
 
-  prepareToBeSigned(transactionAction: EthereumTransactionAction): Promise<void>
+  prepareToBeSigned(): Promise<void>
 
   setFromRaw(rawTransaction: any): Promise<void>
 
   /** Sign the transaction body with private key(s) and add to attached signatures */
   sign(privateKeys: EthereumPrivateKey[]): Promise<void>
-
-  /** Ensures that the value comforms to a well-formed signature */
-  toSignature(value: string): EthereumSignature
 
   validate(): Promise<void>
 }

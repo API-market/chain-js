@@ -1,11 +1,6 @@
-import {
-  convertStringifiedOrObjectToObject,
-  getUniqueValues,
-  isNullOrEmpty,
-  jsonParseAndRevive,
-} from '../../../../../helpers'
+import { getUniqueValues, isNullOrEmpty, jsonParseAndRevive } from '../../../../../helpers'
 import { throwNewError } from '../../../../../errors'
-import { EthereumAddress, EthereumPrivateKey, EthereumSignature, EthereumTransactionAction } from '../../../models'
+import { EthereumAddress, EthereumPrivateKey, EthereumTransactionAction } from '../../../models'
 import { EthereumMultisigPluginTransaction } from '../ethereumMultisigPlugin'
 import {
   approveSafeTransaction,
@@ -33,9 +28,6 @@ export class GnosisSafeMultisigPluginTransaction implements EthereumMultisigPlug
 
   /** mirrors the action from the ethTransction - used to determine if action has changed when setFromRaw */
   private _action: EthereumTransactionAction
-
-  /** mirrors the action from the ethTransction - used to determine if action has changed when setFromRaw */
-  private _actionUsedForRaw: EthereumTransactionAction
 
   private _chainUrl: string
 
@@ -167,7 +159,7 @@ export class GnosisSafeMultisigPluginTransaction implements EthereumMultisigPlug
   }
 
   /** Checks if signature addresses match with multisig owners and adds to the signatures array */
-  async addSignatures(signatures: GnosisSafeSignature[]) {
+  async addSignatures(signatures: GnosisSafeSignature[] | string[]) {
     if (isNullOrEmpty(signatures)) {
       // clear signatures
       this._rawTransaction.signatures = null
@@ -176,8 +168,8 @@ export class GnosisSafeMultisigPluginTransaction implements EthereumMultisigPlug
     }
     const signaturesArray = this.gnosisSignatures || []
     const lowercaseOwners = this.owners.map(owner => owner.toLowerCase()) // Case insensitive
-    signatures.forEach(sigOrString => {
-      const signature = convertStringifiedOrObjectToObject(sigOrString) as GnosisSafeSignature
+    signatures.forEach((sigOrString: GnosisSafeSignature | string) => {
+      const signature = toGnosisSignature(sigOrString)
       assertValidGnosisSignature(signature)
       if (!lowercaseOwners.includes(signature.signer.toLowerCase())) {
         throwNewError(`Signature data:${signature.data} does not belong to any of the multisig owner addresses`)
@@ -226,17 +218,19 @@ export class GnosisSafeMultisigPluginTransaction implements EthereumMultisigPlug
    * Set safeTransaction from rawTransaction that has passed from ethTransaction class.
    */
   public async prepareToBeSigned(): Promise<void> {
-    // only set raw from if the action has changed since the last prepareToBeSigned
-    if (this._action === this._actionUsedForRaw) return
     // only update _rawTransaction if we've changed the action since creating it last
-    this._actionUsedForRaw = this._action
-    this._rawTransaction = await transactionToSafeTx(this._action, this.options)
-    await this.calculateTransactionHash()
+    if (isNullOrEmpty(this._rawTransaction)) {
+      this._rawTransaction = await transactionToSafeTx(this._action, this.options)
+      await this.calculateTransactionHash()
+    }
   }
 
   /** Save action in this plug-in to reflect the latest action for the ethTransaction */
   public addAction(action: EthereumTransactionAction): void {
-    this._action = action
+    if (this._action !== action) {
+      this._action = action
+      this._rawTransaction = null
+    }
   }
 
   public async calculateTransactionHash() {
@@ -269,11 +263,6 @@ export class GnosisSafeMultisigPluginTransaction implements EthereumMultisigPlug
       this.chainUrl,
       this.gnosisSignatures,
     )
-  }
-
-  /** Ensures that the value comforms to a well-formed signature */
-  public toSignature(value: any): EthereumSignature {
-    return toGnosisSignature(value)
   }
 
   public validate(): Promise<void> {

@@ -241,7 +241,8 @@ export class EthereumTransaction implements Transaction {
     if (!this.isMultisig) {
       await this.setNonceIfEmpty(this.senderAddress)
     } else {
-      await this.multisigTransaction.prepareToBeSigned(this._actionHelper.action)
+      this.multisigTransaction.addAction(this._actionHelper.action)
+      await this.multisigTransaction.prepareToBeSigned()
     }
   }
 
@@ -350,8 +351,8 @@ export class EthereumTransaction implements Transaction {
   // signatures
 
   /** Get signature attached to transaction - returns null if no signature */
-  get signatures(): EthereumSignature[] {
-    let signatures: EthereumSignature[] = []
+  get signatures(): EthereumSignature[] | string[] {
+    let signatures: EthereumSignature[] | string[] = []
     if (this.isMultisig) {
       signatures = this.multisigTransaction.signatures
     } else {
@@ -370,7 +371,7 @@ export class EthereumTransaction implements Transaction {
   }
 
   /** Add signature to raw transaction - Accepts array with exactly one signature */
-  addSignatures = async (signatures: EthereumSignature[]): Promise<void> => {
+  addSignatures = async (signatures: EthereumSignature[] | string[]): Promise<void> => {
     if (this.isMultisig) {
       await this.multisigTransaction.addSignatures(signatures)
       return
@@ -384,12 +385,12 @@ export class EthereumTransaction implements Transaction {
       this.assertHasRaw()
       const signature = signatures[0]
       this.assertValidSignature(signature)
-      this._actionHelper.signature = signature
+      this._actionHelper.signature = toEthereumSignature(signature)
     }
   }
 
   /** Throws if signatures isn't properly formatted */
-  private assertValidSignature = (signature: EthereumSignature) => {
+  private assertValidSignature = (signature: EthereumSignature | string) => {
     if (!isValidEthereumSignature(signature)) {
       throwNewError(`Not a valid signature : ${signature}`, 'signature_invalid')
     }
@@ -792,9 +793,6 @@ export class EthereumTransaction implements Transaction {
 
   /** Ensures that the value comforms to a well-formed signature */
   public toSignature(value: any): EthereumSignature {
-    if (this.isMultisig) {
-      return this.multisigTransaction.toSignature(value)
-    }
     return toEthereumSignature(value)
   }
 
