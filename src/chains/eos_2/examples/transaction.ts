@@ -107,7 +107,7 @@ async function run() {
   // await transaction.setFromRaw(serializedTransaction)
   // await transaction.validate()
   // console.log('missing signatures:', transaction.missingSignatures)
-  // transaction.signatures = signatures
+  // await transaction.addSignatures(signatures)
   // await transaction.validate()
 
   // console.log('hasAllRequiredSignatures:', transaction.hasAllRequiredSignatures)
