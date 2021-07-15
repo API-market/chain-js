@@ -26,9 +26,8 @@ export class EosActionHelper {
 
   private _chainState: EosChainState
 
-  /** Creates a new Action from 'human-readable' transfer or contact info
-   *  OR from 'raw' data property
-   *  Allows access to human-readable properties (method, parameters) or raw data (hex) */
+  /** Creates a new Action from 'human-readable' transfer OR from 'raw' data property
+   *  Allows access to human-readable propertie or raw data (Uint8Array) */
   constructor(
     actionInput: EosActionStruct[] | EosSerializedTransaction[],
     options: EosTransactionOptions,
@@ -104,6 +103,8 @@ export class EosActionHelper {
     throw Error('Missing or malformed serializedTransaction (ensureSerializedIsRaw)')
   }
 
+  /** Deserialize and set human-readable transaction action and header properties
+   */
   public async setActionsAndHeaderFromRaw(): Promise<any> {
     this.assertIsConnected()
     const { actions, ...header } = await this._chainState.api.deserializeTransactionWithActions(this.raw)
@@ -111,6 +112,9 @@ export class EosActionHelper {
     this.actions = actions
   }
 
+  /** If there is no raw property set
+   * Serialize transaction and set raw property
+   */
   public async serializeActions() {
     if (this.raw) return
     const { blocksBehind, expireSeconds } = this.options
